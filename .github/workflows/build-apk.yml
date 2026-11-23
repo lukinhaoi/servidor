@@ -8,6 +8,7 @@ on:
       - "Missao_Evoluir_Android_Nativo_v5.zip"
       - ".github/workflows/build-apk.yml"
       - ".source/rebuild-trigger.txt"
+      - ".source/rebuild-trigger2.txt"
   workflow_dispatch:
 
 permissions:
