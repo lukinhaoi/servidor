@@ -51,6 +51,19 @@ jobs:
           unzip -t Missao_Evoluir_Android_Nativo_v5.zip
           unzip -q Missao_Evoluir_Android_Nativo_v5.zip
 
+      - name: Fix Kotlin TextView property shadowing
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("missao_evoluir_android/app/src/main/java/com/missaoevoluir/app/MainActivity.kt")
+          source = p.read_text()
+          old = 'val dot = TextView(this).apply {\\n            text = "•"'
+          new = 'val dot = TextView(this).apply {\\n            this.text = "•"'
+          if old not in source:
+              raise SystemExit("Expected bullet TextView source was not found; refusing an uncertain patch.")
+          p.write_text(source.replace(old, new, 1))
+          PY
+
       - name: Build debug APK
         run: gradle --no-daemon --stacktrace -p missao_evoluir_android :app:assembleDebug
 
