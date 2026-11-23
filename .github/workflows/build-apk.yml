@@ -5,9 +5,7 @@ on:
     branches:
       - build-missao-evoluir-apk
     paths:
-      - ".source/part1.b64"
-      - ".source/part2.b64"
-      - ".source/part3.b64"
+      - "Missao_Evoluir_Android_Nativo_v5.zip"
       - ".github/workflows/build-apk.yml"
   workflow_dispatch:
 
@@ -21,12 +19,6 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Reassemble native project archive
-        run: |
-          cat .source/part1.b64 .source/part2.b64 .source/part3.b64 | base64 --decode > Missao_Evoluir_Android_Nativo_v5.zip
-          unzip -t Missao_Evoluir_Android_Nativo_v5.zip
-          unzip -q Missao_Evoluir_Android_Nativo_v5.zip
-
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -38,11 +30,17 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Install Android SDK packages
+        shell: bash
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          yes | sdkmanager --licenses >/dev/null
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Install Android SDK 35
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Extract native Android project
+        run: |
+          unzip -t Missao_Evoluir_Android_Nativo_v5.zip
+          unzip -q Missao_Evoluir_Android_Nativo_v5.zip
 
       - name: Build debug APK
         run: gradle --no-daemon --stacktrace -p missao_evoluir_android :app:assembleDebug
