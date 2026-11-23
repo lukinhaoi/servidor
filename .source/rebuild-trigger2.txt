@@ -1,0 +1,1 @@
+Run APK build with SDK manager license step corrected.
